@@ -140,7 +140,10 @@ class RootWidget(FloatLayout):
 #########################################
 ## PLACE YOUR CODE BETWEEN THESE LINES ##
 #########################################
+    def run_algorithm(self):
 
+
+        print("ok")
 #########################################
         
 

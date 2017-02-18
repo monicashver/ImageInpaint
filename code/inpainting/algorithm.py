@@ -32,7 +32,7 @@ from debug import *
 # or define other utility functions, 
 # include them here
 
-            
+import os         
 #########################################
 
 
@@ -95,9 +95,26 @@ class Inpainting:
         #########################################
         ## PLACE YOUR CODE BETWEEN THESE LINES ##
         #########################################
-
-        # COPY INTO THIS SPACE YOUR IMPLEMENTATION OF THIS FUNCTION
-        # FROM YOUR algorithm.py of A1
+        
+        #Check that valid key given
+        if (not key in self._images):
+            success, msg = False, 'Invalid key provided: ' + key
+            
+        #Check if given filename is valid
+        elif (not os.path.isfile(fileName)):
+            success, msg = False, 'Invalid filename provided: ' + fileName
+        else:
+            #Attemp to load image
+            picture = cv.imread(fileName, cv.IMREAD_UNCHANGED)
+            
+            #imread failed
+            if (type(picture) == None):
+                success, msg = False, 'Failed to load image properly'
+                
+            #imread was successful 
+            else:
+                self._images[key] = picture
+                success, msg = True, "Successfully loaded image"             
 
         #########################################
         return success, msg
@@ -115,6 +132,19 @@ class Inpainting:
         #########################################
         ## PLACE YOUR CODE BETWEEN THESE LINES ##
         #########################################
+
+        data = self._images[key]
+        
+        #Invalid key provided
+        if(key not in self._images):
+            success, msg = False, 'Invalid key provided'
+        
+        #Valid key, but value for that key is None
+        elif (type(data) == None):
+            success, msg = False, 'There is no data in key: ' + key + 'to write'
+        else:
+            cv.imwrite(fileName, data)
+            success = True, 'Successfully wrote image'
 
         #########################################
         return success, msg
@@ -134,7 +164,7 @@ class Inpainting:
     #
     def exampleBasedInpainting(self, imviewer, maxIterations=None):
         """
-success, errorMessage = exampleBasedInpainting(self)
+        success, errorMessage = exampleBasedInpainting(self)
         
         Perform image inpainting. Returns True if successful (ie.
         all inputs and outputs are valid) and False if not. When success=False

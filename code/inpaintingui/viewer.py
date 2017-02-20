@@ -144,7 +144,7 @@ class ImageViewer(Scatter):
             # delete any axes we've already drawn
             if self.ud.has_key('group'):
                 self.canvas.remove_group(self.ud['group'])
-        else:    
+        else:
             # get the user-defined data dictionary for the touch event
             self.ud = touch.ud
             # get the unique ID of the touch event and store it in the
@@ -276,18 +276,16 @@ class ImageViewer(Scatter):
 #########################################
     # function to handle a mouse button released event
     def on_touch_up_callback(self, touch):
-
         if 'button' not in touch.profile:
             return
         # we are only interested in left mouse button events
         if (touch.button != 'left'):
             return
         else:
-            if(self.ud):
-                #removes the label of (x,y)
-                self.remove_widget(self.ud['label'])
-                #removes the lines from canvas
-                self.canvas.remove_group(self.ud['group'])
+            #removes the label of (x,y)
+            self.remove_widget(self.ud['label'])
+            #removes the lines from canvas
+            self.canvas.remove_group(self.ud['group'])
 
 #########################################
 

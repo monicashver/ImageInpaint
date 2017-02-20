@@ -276,6 +276,10 @@ class ImageViewer(Scatter):
 #########################################
     # function to handle a mouse button released event
     def on_touch_up_callback(self, touch):
+
+        if(not hasattr(self, 'ud')):
+            return
+
         if 'button' not in touch.profile:
             return
         # we are only interested in left mouse button events

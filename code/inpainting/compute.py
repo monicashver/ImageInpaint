@@ -71,9 +71,27 @@ def computeC(psiHatP=None, filledImage=None, confidenceImage=None):
     #########################################
     ## PLACE YOUR CODE BETWEEN THESE LINES ##
     #########################################
+    print('>computeC')
+    #i think you have to loop all pixels in patch
+    width = (psiHatP._w * 2) + 1
     
-    # Replace this dummy value with your own code
-    C = 1    
+    #NOTE: 0 is black => In fill area => C(p) = 0
+
+    x, y = psiHatP._coords[0] - psiHatP._w - 1, psiHatP._coords[1] - psiHatP._w - 1
+
+    print('coords', psiHatP._coords)
+    print('x', x, 'y', y)
+
+    confidence = confidenceImage[x:x+width, y:y+width] / 255
+    filled = filledImage[x:x+width, y:y+width] / 255
+
+    #component wise multiplication - any non confident cells will have a value of 0
+    c_f = np.multiply(confidence, filled)
+
+    #add up all entries to get the total sum and divide by the area of patch
+    C = np.sum(c_f) / (width ** 2)
+
+    #shorter solution: return np.sum(np.multiply(confident, filled)) / (width ** 2)
     #########################################
     
     return C
@@ -110,13 +128,33 @@ def computeGradient(psiHatP=None, inpaintedImage=None, filledImage=None):
     assert filledImage is not None
     assert psiHatP is not None
     
+    print('>computerGradient')
     #########################################
     ## PLACE YOUR CODE BETWEEN THESE LINES ##
     #########################################
     
     # Replace these dummy values with your own code
     Dy = 1
-    Dx = 0    
+    Dx = 0
+
+    #convert colour inpaintedImage to greyscale
+
+    width = (psiHatP._w  * 2) + 1
+
+    #print(psiHatP._im2mat)
+    #print('filledimage size', filledImage.shape)
+    #print('inpainted image size', inpaintedImage.shape)
+    grey_I = cv.cvtColor(inpaintedImage, cv.COLOR_BGR2GRAY)
+
+    x = psiHatP._coords[0] - psiHatP._w - 1
+    y = psiHatP._coords[1] - psiHatP._w - 1
+    #print('coords', psiHatP._coords)
+    #print('x', x, 'y', y)
+
+    patch = inpaintedImage[x:x+width, y:y+width]
+    filled = filledImage[x:x+width, y:y+width]
+    #print(patch, filled)
+    
     #########################################
     
     return Dy, Dx

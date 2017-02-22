@@ -184,7 +184,20 @@ class Inpainting:
         ## source much be a 3-channel uint8 image and alpha must be a 
         ## one-channel uint8 image.
         
-        success = True
+        #check alpha is same size as source
+        if(self._images['source'].shape[0:2] != self._images['alpha'].shape[0:2]):
+            success, msg = False, 'Error: alpha must an image of size equal to source'
+            return success, msg
+        
+        #check source is color image of type uint8
+        elif(len(self._images['source'].shape) != 3) or (self._images['source'].dtype != 'uint8'):
+            success, msg = False, 'Error: source must be a colour image of type uint8' 
+            return success, msg
+
+        #check alpha is a greyscale image of type uint8
+        elif((len(self._images['alpha'].shape) != 2) or (self._images['alpha'].dtype != 'uint8')):
+            success, msg = False, 'Error: alpha must be a greyscale image of type uint8'
+            return success, msg
 
         #########################################
 
@@ -192,6 +205,7 @@ class Inpainting:
         # Handle variable/data structure initialization
         #
         
+        print(self._images['confidence'], 'ALPHA\n', self._images['alpha'], 'SOURCE\n', self._images['source'])
         self.setPatchRadius(self.patchRadius())
         self.debug.setImviewer(imviewer)
 
@@ -477,6 +491,7 @@ class Inpainting:
     # initialize the image where patch confidences are stored
     def confidenceInitialize(self):
         self._images['confidence'] = 255.0*(self._images['filled'] > 0)
+        print(self._images['confidence'])
         
     # once the confidence of a patch on the fill front has been computed,
     # we assign that confidence to all unfilled pixels in the patch

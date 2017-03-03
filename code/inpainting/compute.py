@@ -135,21 +135,27 @@ def computeGradient(psiHatP=None, inpaintedImage=None, filledImage=None):
     Dy = 1
     Dx = 0
 
+    #convert the picture to greyscale
     grey_patch = cv.cvtColor(psiHatP.pixels(), cv.COLOR_BGR2GRAY)
 
+    #get the x and y direction of the image gradient
     sobelx = cv.Sobel(grey_patch, cv.CV_64F, 1, 0, ksize=11)
     sobely = cv.Sobel(grey_patch, cv.CV_64F, 0, 1, ksize=11)
 
+    #square both the x and y components
     f_sobelx = np.multiply(sobelx, sobelx)
     f_sobely = np.multiply(sobely, sobely)
 
+    #add together and get the square root (the magnitude)
     total = np.sqrt(f_sobely + f_sobelx)
 
+    #get the index of the maximum gradient
     index = unravel_index(total.argmax(), total.shape)
+
+    #find the associated x and y gradient components
     Dx = sobelx[index[0]][index[1]]
     Dy = sobely[index[0]][index[1]]
 
-    print(Dx, Dy)
     return Dy, Dx
 
 #########################################

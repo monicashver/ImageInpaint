@@ -202,7 +202,8 @@ class Inpainting:
         elif((len(self._images['alpha'].shape) != 2) or (self._images['alpha'].dtype != 'uint8')):
             success, msg = False, 'Error: alpha must be a greyscale image of type uint8'
             return success, msg
-
+        else:
+            success, msg = True, "OK"
         #########################################
 
         #

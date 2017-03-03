@@ -141,9 +141,6 @@ def computeGradient(psiHatP=None, inpaintedImage=None, filledImage=None):
 
     width = (psiHatP._w  * 2) + 1
 
-    #print(psiHatP._im2mat)
-    #print('filledimage size', filledImage.shape)
-    #print('inpainted image size', inpaintedImage.shape)
     grey_I = cv.cvtColor(inpaintedImage, cv.COLOR_BGR2GRAY)
 
     x = psiHatP._coords[0] - psiHatP._w - 1
@@ -152,9 +149,18 @@ def computeGradient(psiHatP=None, inpaintedImage=None, filledImage=None):
     #print('x', x, 'y', y)
 
     patch = inpaintedImage[x:x+width, y:y+width]
-    filled = filledImage[x:x+width, y:y+width]
-    #print(patch, filled)
+    filled = filledImage[x:x+width, y:y+width] / 255
+
+    print(patch.shape, filled.shape)
+    print('patch\n', patch, '\nfilled\n', filled)
     
+
+    ###
+    # from open CV doc, functions that will computer x and y gradient
+    # laplacian = cv2.Laplacian(img,cv2.CV_64F)
+    # sobelx = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=5)
+    # sobely = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=5)
+
     #########################################
     
     return Dy, Dx
@@ -200,10 +206,40 @@ def computeNormal(psiHatP=None, filledImage=None, fillFront=None):
     #########################################
     ## PLACE YOUR CODE BETWEEN THESE LINES ##
     #########################################
+    print(">computeNormal")
+    width = (psiHatP._w * 2) + 1
     
+    #NOTE: 0 is black => In fill area => C(p) = 0
+
+    x, y = psiHatP.row() - psiHatP.radius() - 1, psiHatP.col() - psiHatP.radius() - 1
+
+    print('coords', psiHatP._coords)
+    print('x', x, 'y', y)
+
+    print("im2mat", psiHatP.im2mat(1,2))
+    print("mat2im", psiHatP.mat2im(1,2))
+    print("filled", psiHatP.printFilled())
+    #print("printChannel", psiHatP.printChannel())
+    print("numChannels", psiHatP.numChannels())
+
+    front = fillFront[x:x+width, y:y+width] / 255
+    filled = filledImage[x:x+width, y:y+width] / 255
+
+    print(front, filled)
+
+    sobelx = cv.Sobel(filledImage, cv.CV_64F, 1, 0, ksize=5)
+    sobely = cv.Sobel(filledImage, cv.CV_64F, 0, 1, ksize=5)
+
+    print(sobely, sobelx)
+    Nx, Ny = 0, 0 
+    #if only 1 pixel on the front is filled
+    if(np.count_nonzero(front == 1) <= 1):
+        Nx, Ny = None, None
+
+    else:
     # Replace these dummy values with your own code
-    Ny = 0
-    Nx = 1    
+        print("holding")
+        #allows us to ignore unfilled pixels (I think)
     #########################################
 
     return Ny, Nx

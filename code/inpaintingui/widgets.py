@@ -142,8 +142,11 @@ class RootWidget(FloatLayout):
 #########################################
     def run_algorithm(self):
 
+        print(self.inpaintingControl.maxIterations())
 
-        print("ok")
+        for i in range(self.inpaintingControl.maxIterations()):
+            self.step_algorithm()
+
         return True
 #########################################
         

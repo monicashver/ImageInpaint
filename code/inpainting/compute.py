@@ -34,8 +34,8 @@ import copyutils
 # implementation does not use any such packages
 
 #########################################
-
-
+from scipy.linalg import norm
+from numpy import unravel_index
 #########################################
 #
 # Computing the Patch Confidence C(p)
@@ -71,19 +71,19 @@ def computeC(psiHatP=None, filledImage=None, confidenceImage=None):
     #########################################
     ## PLACE YOUR CODE BETWEEN THESE LINES ##
     #########################################
-    print('>computeC')
+    #print('>computeC')
     #i think you have to loop all pixels in patch
-    width = (psiHatP._w * 2) + 1
+    width = (psiHatP.radius() * 2) + 1
     
     #NOTE: 0 is black => In fill area => C(p) = 0
 
-    x, y = psiHatP._coords[0] - psiHatP._w - 1, psiHatP._coords[1] - psiHatP._w - 1
+    x, y = psiHatP.row() - psiHatP.radius() - 1, psiHatP.col() - psiHatP.radius() - 1
 
-    print('coords', psiHatP._coords)
-    print('x', x, 'y', y)
+    #print('coords', psiHatP.row(), psiHatP.col())
+    #print('x', x, 'y', y)
 
-    confidence = confidenceImage[x:x+width, y:y+width] / 255
-    filled = filledImage[x:x+width, y:y+width] / 255
+    confidence = confidenceImage[x : x + width, y : y + width] 
+    filled = filledImage[x : x + width, y : y + width]
 
     #component wise multiplication - any non confident cells will have a value of 0
     c_f = np.multiply(confidence, filled)
@@ -127,8 +127,6 @@ def computeGradient(psiHatP=None, inpaintedImage=None, filledImage=None):
     assert inpaintedImage is not None
     assert filledImage is not None
     assert psiHatP is not None
-    
-    print('>computerGradient')
     #########################################
     ## PLACE YOUR CODE BETWEEN THESE LINES ##
     #########################################
@@ -137,32 +135,21 @@ def computeGradient(psiHatP=None, inpaintedImage=None, filledImage=None):
     Dy = 1
     Dx = 0
 
-    #convert colour inpaintedImage to greyscale
+    grey_patch = cv.cvtColor(psiHatP.pixels(), cv.COLOR_BGR2GRAY)
 
-    width = (psiHatP._w  * 2) + 1
+    sobelx = cv.Sobel(grey_patch, cv.CV_64F, 1, 0, ksize=11)
+    sobely = cv.Sobel(grey_patch, cv.CV_64F, 0, 1, ksize=11)
 
-    grey_I = cv.cvtColor(inpaintedImage, cv.COLOR_BGR2GRAY)
+    f_sobelx = np.multiply(sobelx, sobelx)
+    f_sobely = np.multiply(sobely, sobely)
 
-    x = psiHatP._coords[0] - psiHatP._w - 1
-    y = psiHatP._coords[1] - psiHatP._w - 1
-    #print('coords', psiHatP._coords)
-    #print('x', x, 'y', y)
+    total = np.sqrt(f_sobely + f_sobelx)
 
-    patch = inpaintedImage[x:x+width, y:y+width]
-    filled = filledImage[x:x+width, y:y+width] / 255
+    index = unravel_index(total.argmax(), total.shape)
+    Dx = sobelx[index[0]][index[1]]
+    Dy = sobely[index[0]][index[1]]
 
-    print(patch.shape, filled.shape)
-    print('patch\n', patch, '\nfilled\n', filled)
-    
-
-    ###
-    # from open CV doc, functions that will computer x and y gradient
-    # laplacian = cv2.Laplacian(img,cv2.CV_64F)
-    # sobelx = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=5)
-    # sobely = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=5)
-
-    #########################################
-    
+    print(Dx, Dy)
     return Dy, Dx
 
 #########################################
@@ -206,40 +193,26 @@ def computeNormal(psiHatP=None, filledImage=None, fillFront=None):
     #########################################
     ## PLACE YOUR CODE BETWEEN THESE LINES ##
     #########################################
-    print(">computeNormal")
-    width = (psiHatP._w * 2) + 1
-    
-    #NOTE: 0 is black => In fill area => C(p) = 0
 
-    x, y = psiHatP.row() - psiHatP.radius() - 1, psiHatP.col() - psiHatP.radius() - 1
+    sobelx = cv.Sobel(psiHatP.filled(), cv.CV_64F, 1, 0, ksize=5)
+    sobely = cv.Sobel(psiHatP.filled(), cv.CV_64F, 0, 1, ksize=5)
 
-    print('coords', psiHatP._coords)
-    print('x', x, 'y', y)
-
-    print("im2mat", psiHatP.im2mat(1,2))
-    print("mat2im", psiHatP.mat2im(1,2))
-    print("filled", psiHatP.printFilled())
-    #print("printChannel", psiHatP.printChannel())
-    print("numChannels", psiHatP.numChannels())
-
-    front = fillFront[x:x+width, y:y+width] / 255
-    filled = filledImage[x:x+width, y:y+width] / 255
-
-    print(front, filled)
-
-    sobelx = cv.Sobel(filledImage, cv.CV_64F, 1, 0, ksize=5)
-    sobely = cv.Sobel(filledImage, cv.CV_64F, 0, 1, ksize=5)
-
-    print(sobely, sobelx)
+    # print(sobely, '\n', sobelx)
     Nx, Ny = 0, 0 
     #if only 1 pixel on the front is filled
-    if(np.count_nonzero(front == 1) <= 1):
+    if(np.count_nonzero(psiHatP.filled() == 1) <= 1):
         Nx, Ny = None, None
 
     else:
     # Replace these dummy values with your own code
-        print("holding")
+       #print("holding")
+        Nx =  - sum(sobely) // (width ** 2)
+        Ny = sum(sobelx) // (width ** 2)
         #allows us to ignore unfilled pixels (I think)
     #########################################
 
     return Ny, Nx
+
+
+
+

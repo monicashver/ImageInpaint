@@ -176,7 +176,6 @@ class PSI:
             self._C = computeC(psiHatP = self, 
                                confidenceImage = confidence, 
                                filledImage = filled)
-            print(self._C)
     #
     # Compute the data term D(p) of the patch center by calling the
     # corresponding function in compute.py

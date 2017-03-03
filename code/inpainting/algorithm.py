@@ -185,6 +185,10 @@ class Inpainting:
         ## one-channel uint8 image.
         
         #check alpha is same size as source
+
+        if(self._images['source'] == None or self._images['alpha'] == None):
+            success, msg = False, 'Error: missing alpha or source image'
+            return success, msg
         if(self._images['source'].shape[0:2] != self._images['alpha'].shape[0:2]):
             success, msg = False, 'Error: alpha must an image of size equal to source'
             return success, msg
@@ -205,7 +209,6 @@ class Inpainting:
         # Handle variable/data structure initialization
         #
         
-        print(self._images['confidence'], 'ALPHA\n', self._images['alpha'], 'SOURCE\n', self._images['source'])
         self.setPatchRadius(self.patchRadius())
         self.debug.setImviewer(imviewer)
 

@@ -200,20 +200,24 @@ def computeNormal(psiHatP=None, filledImage=None, fillFront=None):
     ## PLACE YOUR CODE BETWEEN THESE LINES ##
     #########################################
 
+
+    grey_patch = psiHatP.filled() / 255
+
     sobelx = cv.Sobel(psiHatP.filled(), cv.CV_64F, 1, 0, ksize=5)
     sobely = cv.Sobel(psiHatP.filled(), cv.CV_64F, 0, 1, ksize=5)
 
-    # print(sobely, '\n', sobelx)
     Nx, Ny = 0, 0 
-    #if only 1 pixel on the front is filled
-    if(np.count_nonzero(psiHatP.filled() == 1) <= 1):
-        Nx, Ny = None, None
 
+    magnitude = np.sqrt(np.multiply(sobelx, sobelx) + np.multiply(sobely, sobely))
+
+    width = (psiHatP.radius() * 2) + 1
+    #if only 1 pixel on the front is filled
+    if(np.count_nonzero(psiHatP.filled()) <= 1):
+        Nx, Ny = None, None
     else:
     # Replace these dummy values with your own code
-       #print("holding")
-        Nx =  - sum(sobely) // (width ** 2)
-        Ny = sum(sobelx) // (width ** 2)
+        Nx =  - np.sum(sobely) // (width ** 2)
+        Ny = np.sum(sobelx) // (width ** 2)
         #allows us to ignore unfilled pixels (I think)
     #########################################
 

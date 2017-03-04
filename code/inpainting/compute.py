@@ -71,25 +71,25 @@ def computeC(psiHatP=None, filledImage=None, confidenceImage=None):
     #########################################
     ## PLACE YOUR CODE BETWEEN THESE LINES ##
     #########################################
-    #print('>computeC')
+
     #i think you have to loop all pixels in patch
     width = (psiHatP.radius() * 2) + 1
     
     #NOTE: 0 is black => In fill area => C(p) = 0
 
-    x, y = psiHatP.row() - psiHatP.radius() - 1, psiHatP.col() - psiHatP.radius() - 1
+    #x, y = psiHatP.row() - psiHatP.radius() - 1, psiHatP.col() - psiHatP.radius() - 1
 
-    #print('coords', psiHatP.row(), psiHatP.col())
-    #print('x', x, 'y', y)
+    #print(x + width, y + width)
+    #confidence = confidenceImage[x : x + width, y : y + width] 
+    #filled = psiHatP.filled()
 
-    confidence = confidenceImage[x : x + width, y : y + width] 
-    filled = filledImage[x : x + width, y : y + width]
-
+    #print(psiHatP.filled(), filled, confidence)
+    #print(psiHatP.filled().shape, confidence.shape)
     #component wise multiplication - any non confident cells will have a value of 0
-    c_f = np.multiply(confidence, filled)
+    #c_f = np.multiply(confidence, filled)
 
     #add up all entries to get the total sum and divide by the area of patch
-    C = np.sum(c_f) / (width ** 2)
+    C = np.sum(psiHatP.filled()) / (width ** 2)
 
     #shorter solution: return np.sum(np.multiply(confident, filled)) / (width ** 2)
     #########################################
